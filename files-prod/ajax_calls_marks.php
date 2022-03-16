@@ -98,14 +98,33 @@ if(isset($_POST["term_change"]))	{
 		if($numberofrows == 0 ){
 			
 			if($term_id ==2){
-				$stmt = $mysqli->prepare("select count(*) from student_term_master a, class_stud_master b where a.cs_id=b.cs_id and b.student_id=? and a.term_id=1");
-				$stmt->bind_param("d",$student_id);
+
+				// $stmt = $mysqli->prepare("select count(*)  from student_term_master a, class_stud_master b where a.cs_id=b.cs_id and b.student_id=? and a.term_id=1");
+
+
+				$stmt = $mysqli->prepare("						
+					SELECT
+					count(student_term_id)
+					FROM
+					student_term_master a
+					WHERE
+					cs_id = (
+						SELECT
+							cs_id
+						FROM
+							class_stud_master
+						WHERE
+							student_id = ?
+							and fy_id = ?) and term_id = 1
+				");
+				$stmt->bind_param("dd",$student_id,$fy_id);
 				$result = $stmt->execute();
 				$stmt->store_result();
 				$stmt->bind_result($count);
 				$norws = $stmt->num_rows;
 				while($data = $stmt->fetch()){}
 				$d[0][3]=$count;
+				
 			}
 
 
@@ -117,7 +136,8 @@ if(isset($_POST["term_change"]))	{
 				$subject_id="";
 				$subject_name="";
 				$class_id=1;
-				//$stmt = $mysqli->prepare("SELECT a.subject_id,b.subject_name FROM class_subject_master a,subject_master b where a.subject_id=b.subject_id and a.fy_id=? and a.class_id=?");
+				/* codechanges in code : march2022
+				 $stmt = $mysqli->prepare("SELECT a.subject_id,b.subject_name FROM class_subject_master a,subject_master b where a.subject_id=b.subject_id and a.fy_id=? and a.class_id=?"); */
 				$stmt = $mysqli->prepare("SELECT a.subject_id,b.subject_name FROM class_subject_master a,subject_master b where a.subject_id=b.subject_id and a.fy_id=? and a.is_delete=1 and b.is_delete=1 and a.class_id=(select b.class_id from stud_regist_master a,class_stud_master b where b.is_delete = 1 and a.registration_id=b.student_id and b.fy_id=? and a.registration_id=?)");
 				$stmt->bind_param("ddd",$fy_id,$fy_id,$student_id);
 				$result = $stmt->execute();
@@ -129,31 +149,34 @@ if(isset($_POST["term_change"]))	{
 				$counter1=2;
 				while($data = $stmt->fetch())
 					{
+
 						$d[$counter][0]=$subject_id;
 						$d[$counter][1]=$subject_name;
+
 						if($term_id ==2 ){
-						$counter1=2;
-						$stmt1 = $mysqli->prepare("SELECT a.marks_obtained FROM student_marks_obtain_master a, marks_name_master b where a.marks_name_id=b.marks_name_id and student_term_id=(select student_term_id from student_term_master where term_id=1 and cs_id=(select cs_id from class_stud_master where student_id=? and fy_id=? )) and a.subject_id=?");
-						$stmt1->bind_param("ddd",$student_id,$fy_id,$subject_id);
-						$result1 = $stmt1->execute();
-						$stmt1->store_result();
-						$stmt1->bind_result($marks_obt);
-						$d[0][3]= $stmt1->num_rows;
 
-						while($data1 = $stmt1->fetch())
-						{
-							$d[$counter][$counter1]=$marks_obt;
-							$counter1++;
-					
-						}
-						if($d[0][3] == 0 ){
-							$d[$counter][2]='';
-							$d[$counter][3]='';
-							$d[$counter][4]='';
-							$d[$counter][5]='';
+								$counter1=2;
+								$stmt1 = $mysqli->prepare("SELECT a.marks_obtained FROM student_marks_obtain_master a, marks_name_master b where a.marks_name_id=b.marks_name_id and student_term_id=(select student_term_id from student_term_master where term_id=1 and cs_id=(select cs_id from class_stud_master where student_id=? and fy_id=? )) and a.subject_id=?");
+								$stmt1->bind_param("ddd",$student_id,$fy_id,$subject_id);
+								$result1 = $stmt1->execute();
+								$stmt1->store_result();
+								$stmt1->bind_result($marks_obt);
+								$d[0][3]= $stmt1->num_rows;
+
+								while($data1 = $stmt1->fetch())
+								{
+									$d[$counter][$counter1]=$marks_obt;
+									$counter1++;
+							
+								}
+								if($d[0][3] == 0 ){
+									$d[$counter][2]='';
+									$d[$counter][3]='';
+									$d[$counter][4]='';
+									$d[$counter][5]='';
 
 
-						}
+								}
 
 						}
 						

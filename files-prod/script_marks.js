@@ -232,6 +232,7 @@ function termchange(el)
 		data:'term_change='+values+'&student_id='+stud_id,
 		success: function(response){
 			var drpval = JSON.parse(response);
+			
 			if(drpval[0][0]>0)
 			{
 				el.selectedIndex=0;
@@ -251,8 +252,11 @@ function termchange(el)
 					$("#table1").find("tr:gt(0)").remove(); //delete all row except first
 					}
 					else if(drpval[0][3]==0){
-						document.getElementById("btncalc").style.display ='none';
+
+					document.getElementById("btncalc").style.display ='none';
+					
 					alert("Insert marks for 1st Term first");
+
 					document.getElementById("MarksSaveBtn").style.display = "none";
 					$("#table1").find("tr:gt(0)").remove(); //delete all row except first
 					el.selectedIndex=0;
