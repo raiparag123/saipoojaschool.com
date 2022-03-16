@@ -232,6 +232,7 @@ if(isset($_REQUEST["edit"]))	{
 													<thead>
 														<tr>
 															<th>Class Name</th>
+															<th>Year</th>
 															<th>First Term</th>
 															<th>Second Term</th>
 														</tr>
@@ -240,13 +241,28 @@ if(isset($_REQUEST["edit"]))	{
 													<?php if(isset($_REQUEST["edit"]))	{
 	
 													$regis_id=$_REQUEST["edit"];
-													$stmt = $mysqli->prepare("select a.class_id,b.class_name from class_stud_master a,class_master b where student_id=? and a.class_id=b.class_id order by a.class_id");
+													$stmt = $mysqli->prepare("SELECT
+														c.fy_name,
+														a.class_id,
+														b.class_name
+													FROM
+														class_stud_master a,
+														class_master b,
+														fy_master c
+													WHERE
+														student_id = ?
+														AND a.fy_id = c.fy_id
+														AND a.class_id = b.class_id
+													ORDER BY
+														a.class_id desc");
+
 													$stmt->bind_param("d",$regis_id);
 													$result = $stmt->execute();
 													$stmt->store_result();
-													$stmt->bind_result($class_id,$class_name);
+													$stmt->bind_result($fy_name,$class_id,$class_name);
 													while($data = $stmt->fetch())	{
 														echo "<tr><td>".$class_name."</td>";
+														echo "<td>".$fy_name."</td>";
 
 														$stmt1 = $mysqli->prepare("select a.term_id,a.cs_id,c.class_id,c.class_name from student_term_master a,class_stud_master b,class_master c where a.cs_id =b.cs_id and b.class_id=c.class_id and b.student_id=? AND c.class_id=?");
 														$stmt1->bind_param("dd",$regis_id,$class_id);
