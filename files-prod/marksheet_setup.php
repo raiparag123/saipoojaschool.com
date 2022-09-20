@@ -101,7 +101,8 @@ $fy_id=$_SESSION["fy_id"];
 													<select style="width:250px;" class="form-control  select2" id="namemarksdrp" name="namemarksdrp" onchange="cgnamemarks(this);" >
 													<option value=0 selected>Select Name</option>
 													<?php
-														$stmt = $mysqli->prepare("select registration_id,first_name,regno from stud_regist_master a,class_stud_master b where a.registration_id = b.student_id and a.is_delete=1 and b.is_delete=1 and b.fy_id=?");
+														$stmt = $mysqli->prepare("select registration_id,first_name,regno from stud_regist_master a,class_stud_master b where a.registration_id = b.student_id and a.is_delete=1 and b.is_delete=1 
+														and b.class_id <> 9 and b.class_id <> 10 and b.fy_id=?");
 														$stmt->bind_param("d",$fy_id);
 														$result = $stmt->execute();
 														$stmt->store_result();
