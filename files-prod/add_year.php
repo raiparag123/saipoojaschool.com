@@ -29,7 +29,7 @@ $fy_id=$_SESSION["fy_id"];
 				$count=$stmt->num_rows;
 				while($data = $stmt->fetch())
 				{
-					if($class_id == 10 || $class_id == 20){
+					if($class_id == 8 || $class_id == 18){
 						
 						$stmt1 = $mysqli->prepare("update stud_regist_master set status = 2 where status = 1 and is_delete=1 and registration_id = ?");
 						$stmt1->bind_param("d",$student_id);
